@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SiteSaver
 {
     public interface IDataFetcher
     {
-        Task<string> Fetch(string relativeResource);
+        Task<(string Document, string Path)> Fetch(string relativeResource);
     }
 }

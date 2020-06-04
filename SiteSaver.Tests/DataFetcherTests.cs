@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 namespace SiteSaver.Tests
 {
     [TestClass]
@@ -10,7 +11,7 @@ namespace SiteSaver.Tests
         [TestInitialize]
         public void Setup()
         {
-            _sut = new HtmlFetcher(new System.Uri("https://tretton37.com"));
+            _sut = new RemoteResourceFetcher(new System.Uri("https://tretton37.com"));
         }
 
         [TestMethod]
