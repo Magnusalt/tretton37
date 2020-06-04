@@ -1,13 +1,16 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace SiteSaver
 {
     public class DiskFileHandler : IFileHandler
     {
         private readonly string _destinationDirectory;
-        public DiskFileHandler(string destinationDirectory)
+        private readonly ILogger<DiskFileHandler> _logger;
+
+        public DiskFileHandler(string destinationDirectory, ILogger<DiskFileHandler> logger)
         {
             if (!Uri.IsWellFormedUriString(destinationDirectory, UriKind.RelativeOrAbsolute))
             {
@@ -17,6 +20,7 @@ namespace SiteSaver
             Directory.CreateDirectory(destinationDirectory);
 
             _destinationDirectory = destinationDirectory;
+            _logger = logger;
         }
 
         // Stores a file at the path relative to the provided destination directory
@@ -41,7 +45,9 @@ namespace SiteSaver
             var contentAsBytes = System.Text.Encoding.UTF8.GetBytes(fileContent);
             using (var fileStream = new FileStream(filePath, FileMode.CreateNew))
             {
+                _logger.LogInformation("Writing {0} to disk, total {1} bytes", filePath, contentAsBytes.Length);
                 await fileStream.WriteAsync(contentAsBytes, 0, contentAsBytes.Length);
+                _logger.LogInformation("Done writing {0} to disk", filePath);
             }
         }
     }

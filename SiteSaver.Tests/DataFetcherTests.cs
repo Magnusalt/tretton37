@@ -1,5 +1,7 @@
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
 
 namespace SiteSaver.Tests
 {
@@ -11,7 +13,7 @@ namespace SiteSaver.Tests
         [TestInitialize]
         public void Setup()
         {
-            _sut = new RemoteResourceFetcher(new System.Uri("https://tretton37.com"));
+            _sut = new RemoteResourceFetcher(new System.Uri("https://tretton37.com"), Substitute.For<ILogger<RemoteResourceFetcher>>());
         }
 
         [TestMethod]

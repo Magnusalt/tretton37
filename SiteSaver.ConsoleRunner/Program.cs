@@ -1,21 +1,48 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace SiteSaver.ConsoleRunner
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        /// <summary>
+        /// This app will recursivly download a website
+        /// </summary>
+        /// <param name="domain">The address of the site to download</param>
+        /// <param name="destination">Where to save the files, default [workingDir]\[domainname]</param>
+        public static async Task Main(string destination, string domain = "https://tretton37.com/")
         {
-            var domain = "https://tretton37.com/";
+            try
+            {
+                var uri = new Uri(domain);
 
-            var uri = new Uri(domain);
+                if (string.IsNullOrEmpty(destination))
+                {
+                    destination = Path.Combine(Environment.CurrentDirectory, uri.Host.Replace(".", string.Empty));
+                }
 
-            var destination = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads", uri.Host.Replace(".", string.Empty));
+                var serviceProvider = new ServiceCollection()
+                .AddLogging(log => log.AddConsole())
+                .AddSingleton<IDataFetcher>(sp=> new RemoteResourceFetcher(uri, sp.GetService<ILogger<RemoteResourceFetcher>>()))
+                .AddSingleton<ILinkParser>(sp => new HtmlLinkParser(domain))
+                .AddSingleton<IFileHandler>(sp=> new DiskFileHandler(destination, sp.GetService<ILogger<DiskFileHandler>>()))
+                .AddSingleton<ILinkedDataSaver, SiteSaver>()
+                .BuildServiceProvider();
 
-            var saver = new SiteSaver(new RemoteResourceFetcher(uri), new HtmlLinkParser(domain), new DiskFileHandler(destination));
-            await saver.Save();
+                var saver = serviceProvider.GetService<ILinkedDataSaver>();
+                await saver.Save();
+            }
+            catch (UriFormatException)
+            {
+                System.Console.WriteLine("The domain adress format was not valid, did you forget the protocol (http, https)?");
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine(e.Message);
+            }
         }
     }
 }
