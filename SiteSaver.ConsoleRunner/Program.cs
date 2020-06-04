@@ -25,15 +25,17 @@ namespace SiteSaver.ConsoleRunner
                 }
 
                 var serviceProvider = new ServiceCollection()
-                .AddLogging(log => log.AddConsole())
-                .AddSingleton<IDataFetcher>(sp=> new RemoteResourceFetcher(uri, sp.GetService<ILogger<RemoteResourceFetcher>>()))
-                .AddSingleton<ILinkParser>(sp => new HtmlLinkParser(domain))
-                .AddSingleton<IFileHandler>(sp=> new DiskFileHandler(destination, sp.GetService<ILogger<DiskFileHandler>>()))
-                .AddSingleton<ILinkedDataSaver, SiteSaver>()
-                .BuildServiceProvider();
+                    .AddLogging(log => log.AddConsole())
+                    .AddSingleton<IDataFetcher>(sp=> new RemoteResourceFetcher(uri, sp.GetService<ILogger<RemoteResourceFetcher>>()))
+                    .AddSingleton<ILinkParser>(sp => new HtmlLinkParser(domain))
+                    .AddSingleton<IFileHandler>(sp=> new DiskFileHandler(destination, sp.GetService<ILogger<DiskFileHandler>>()))
+                    .AddSingleton<ILinkedDataSaver, SiteSaver>()
+                    .BuildServiceProvider();
 
                 var saver = serviceProvider.GetService<ILinkedDataSaver>();
                 await saver.Save();
+
+                System.Console.WriteLine("Finished downloading {0}, saved files to: {1}", domain, destination);
             }
             catch (UriFormatException)
             {
