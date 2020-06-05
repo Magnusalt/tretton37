@@ -17,3 +17,17 @@ __Runtime Environment:__
     RID:         linux-x64
     Base Path:   /usr/share/dotnet/sdk/3.1.300/
 
+Usage
+-
+
+To ease argument parsing this project uses "System.CommandLine.DragonFruit" from SiteSaver.ConsoleRunner run the following:
+
+    dotnet run -- --help
+
+Scope and Limitations
+-
+-   Not tested on Windows!
+-   No editing of html documents to work offline.
+-   No resources outside the specified domain is downloaded.
+-   If a child directory is specified but contains link to parent the parent will still be downloaded. 
+-   Very large sites risk OutOfMemoryException

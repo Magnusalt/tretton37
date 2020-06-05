@@ -42,10 +42,18 @@ namespace SiteSaver
 
             var directory = Path.GetDirectoryName(filePath);
             _fileSystem.CreateDirectory(directory);
-            
+
             _logger.LogInformation("Writing {0} to disk", filePath);
 
-            await _fileSystem.WriteFileToDisk(filePath, fileContent);
+            try
+            {
+                await _fileSystem.WriteFileToDisk(filePath, fileContent);
+            }
+            catch (IOException e)
+            {
+                _logger.LogError("Failed to write {0} to disk, message: {1}", filePath, e.Message);
+                return;
+            }
 
             _logger.LogInformation("Done writing {0} to disk", filePath);
         }

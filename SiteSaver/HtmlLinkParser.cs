@@ -63,7 +63,8 @@ namespace SiteSaver
         {
             if (link.StartsWith("javascript")
                 || link.StartsWith("mailto")
-                || link.StartsWith("tel"))
+                || link.StartsWith("tel")
+                || link.StartsWith("sms"))
             {
                 return false;
             }
