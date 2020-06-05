@@ -10,16 +10,17 @@ namespace SiteSaver
         private readonly IDataFetcher _dataFetcher;
         private readonly ILinkParser _linkParser;
         private readonly IFileHandler _fileHandler;
+        private readonly string _invalidResourceTag;
 
         // This is to keep track of visited links, the keys in the dictionary is used as a concurrent set.
         private readonly ConcurrentDictionary<string, byte> _linkTracker;
 
-        public SiteSaver(IDataFetcher dataFetcher, ILinkParser linkParser, IFileHandler fileHandler)
+        public SiteSaver(IDataFetcher dataFetcher, ILinkParser linkParser, IFileHandler fileHandler, string invalidResourceTag)
         {
             _dataFetcher = dataFetcher;
             _linkParser = linkParser;
             _fileHandler = fileHandler;
-
+            _invalidResourceTag = invalidResourceTag;
             _linkTracker = new ConcurrentDictionary<string, byte>();
         }
 
@@ -32,7 +33,7 @@ namespace SiteSaver
         private async Task TraverseLinks(IList<string> links)
         {
             var storeTasks = new List<Task>();
-            var fetchTasks = new List<Task<(string Document, string Path)>>();
+            var fetchTasks = new List<Task<(byte[] Document, string Path)>>();
 
             foreach (var link in links)
             {
@@ -43,7 +44,7 @@ namespace SiteSaver
             var fetchResults = await Task.WhenAll(fetchTasks);
 
             var foundLinks = new List<string>();
-            foreach (var item in fetchResults)
+            foreach (var item in fetchResults.Where(i => i.Path != _invalidResourceTag))
             {
                 foundLinks.AddRange(_linkParser.FindLinks(item.Document, item.Path));
                 storeTasks.Add(_fileHandler.Store(item.Path, item.Document));

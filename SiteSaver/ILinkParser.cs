@@ -2,6 +2,6 @@ namespace SiteSaver
 {
     public interface ILinkParser
     {
-        string[] FindLinks(string html, string path);
+        string[] FindLinks(byte[] file, string path);
     }
 }

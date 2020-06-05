@@ -4,6 +4,6 @@ namespace SiteSaver
 {
     public interface IDataFetcher
     {
-        Task<(string Document, string Path)> Fetch(string relativeResource);
+        Task<(byte[] Document, string Path)> Fetch(string relativeResource);
     }
 }

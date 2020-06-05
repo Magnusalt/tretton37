@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace SiteSaver
 {
@@ -13,7 +14,7 @@ namespace SiteSaver
             _domain = domain;
         }
 
-        public string[] FindLinks(string html, string path)
+        public string[] FindLinks(byte[] file, string path)
         {
             if (Path.HasExtension(path))
             {
@@ -22,6 +23,7 @@ namespace SiteSaver
             // Regex pattern from here: https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-example-scanning-for-hrefs
             string hrefPattern = @"href\s*=\s*(?:[""'](?<1>[^""']*)[""']|(?<1>\S+))";
 
+            var html = System.Text.Encoding.UTF8.GetString(file);
             var matchResult = Regex.Matches(html, hrefPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
             return matchResult
@@ -56,6 +58,7 @@ namespace SiteSaver
             return absolutePath;
         }
 
+        // These invalid beginings are problem specific, consider adding posibility to send in other as arguments
         private bool FilterInvalidLinks(string link)
         {
             if (link.StartsWith("javascript")

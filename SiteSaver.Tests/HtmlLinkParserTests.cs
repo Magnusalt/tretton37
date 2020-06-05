@@ -4,7 +4,7 @@ using System.Linq;
 namespace SiteSaver.Tests
 {
     [TestClass]
-    public class LinkParserTests
+    public class HtmlLinkParserTests
     {
         private ILinkParser _sut;
 
@@ -17,20 +17,21 @@ namespace SiteSaver.Tests
         [TestMethod]
         public void FindLinks_ReturnsOneMatch_WhenDocumentContainsOneAElement()
         {
-            var html = "<a href=\"altyard.solutions\">Altyard solutions AB</a>";
-
-            var results = _sut.FindLinks(html, "somePath");
+            var html = "<a href=\"some/path\">A link</a>";
+            var htmlAsBytes = System.Text.Encoding.UTF8.GetBytes(html);
+            var results = _sut.FindLinks(htmlAsBytes, "somePath");
 
             Assert.AreEqual(1, results.Count());
-            Assert.AreEqual("altyard.solutions", results.First());
+            Assert.AreEqual("some/path", results.First());
         }
 
         [TestMethod]
         public void FindLinks_ReturnsCorrectPath_WhenLinkIsRelative()
         {
             var html = "<a href=\"../blog\">Blog</a>";
+            var htmlAsBytes = System.Text.Encoding.UTF8.GetBytes(html);
 
-            var results = _sut.FindLinks(html, "main/about");
+            var results = _sut.FindLinks(htmlAsBytes, "main/about");
             
             Assert.AreEqual("blog", results.First());
         }

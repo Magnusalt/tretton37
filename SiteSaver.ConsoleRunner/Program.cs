@@ -17,6 +17,7 @@ namespace SiteSaver.ConsoleRunner
         {
             try
             {
+                const string InvalidResourceTag = "@@invalid@@";
                 var uri = new Uri(domain);
 
                 if (string.IsNullOrEmpty(destination))
@@ -26,10 +27,11 @@ namespace SiteSaver.ConsoleRunner
 
                 var serviceProvider = new ServiceCollection()
                     .AddLogging(log => log.AddConsole())
-                    .AddSingleton<IDataFetcher>(sp=> new RemoteResourceFetcher(uri, sp.GetService<ILogger<RemoteResourceFetcher>>()))
+                    .AddSingleton<IFileSystem, FileSystem>()
+                    .AddSingleton<IDataFetcher>(sp=> new RemoteResourceFetcher(uri, sp.GetService<ILogger<RemoteResourceFetcher>>(), InvalidResourceTag))
                     .AddSingleton<ILinkParser>(sp => new HtmlLinkParser(domain))
-                    .AddSingleton<IFileHandler>(sp=> new DiskFileHandler(destination, sp.GetService<ILogger<DiskFileHandler>>()))
-                    .AddSingleton<ILinkedDataSaver, SiteSaver>()
+                    .AddSingleton<IFileHandler>(sp=> new DiskFileHandler(destination, sp.GetService<IFileSystem>(), sp.GetService<ILogger<DiskFileHandler>>()))
+                    .AddSingleton<ILinkedDataSaver>(sp=>new SiteSaver(sp.GetService<IDataFetcher>(), sp.GetService<ILinkParser>(), sp.GetService<IFileHandler>(), InvalidResourceTag))
                     .BuildServiceProvider();
 
                 var saver = serviceProvider.GetService<ILinkedDataSaver>();
