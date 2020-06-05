@@ -20,7 +20,7 @@ __Runtime Environment:__
 Usage
 -
 
-To ease argument parsing this project uses "System.CommandLine.DragonFruit" from SiteSaver.ConsoleRunner run the following:
+To ease argument parsing this project uses "System.CommandLine.DragonFruit". From SiteSaver.ConsoleRunner directory run the following:
 
     dotnet run -- --help
 
