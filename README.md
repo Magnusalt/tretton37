@@ -28,6 +28,7 @@ Scope and Limitations
 -
 -   Not tested on Windows!
 -   No editing of html documents to work offline.
+-   No validation that downloaded data actually match what was requested.
 -   No resources outside the specified domain is downloaded.
 -   If a child directory is specified but contains link to parent the parent will still be downloaded. 
 -   Very large sites risk OutOfMemoryException
