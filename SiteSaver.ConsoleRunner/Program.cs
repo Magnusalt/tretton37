@@ -37,7 +37,11 @@ namespace SiteSaver.ConsoleRunner
                 var saver = serviceProvider.GetService<ILinkedDataSaver>();
                 await saver.Save();
 
-                System.Console.WriteLine("Finished downloading {0}, saved files to: {1}", domain, destination);
+                var logger = serviceProvider.GetService<ILogger<Program>>();
+
+                logger.LogInformation("Finished downloading {0}, saved files to: {1}", domain, destination);
+                logger.LogInformation("Press enter to exit.");
+                Console.ReadLine();
             }
             catch (UriFormatException)
             {
