@@ -35,9 +35,23 @@ __Runtime Environment:__
 Usage
 -
 
+__Run__
+
 To ease argument parsing this project uses "System.CommandLine.DragonFruit". From SiteSaver.ConsoleRunner directory run the following:
 
     dotnet run -- --help
+to list available commands or
+
+    dotnet run 
+to run with defaults (domain=https://tretton37.com, directory=[workDir/tretton37com])
+
+__Test__
+
+In directory SiteSaver.Tests
+
+    dotnet test
+    
+
 
 Scope and Limitations
 -
