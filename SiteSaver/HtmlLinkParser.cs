@@ -45,7 +45,7 @@ namespace SiteSaver
             }
 
             int level = 0;
-            while (link.Substring(level * 3, 3) == $"..{Path.DirectorySeparatorChar}")
+            while (link.Substring(level * 3, 3) == $"../")
             {
                 level++;
             }

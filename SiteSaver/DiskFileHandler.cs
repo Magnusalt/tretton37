@@ -13,11 +13,6 @@ namespace SiteSaver
 
         public DiskFileHandler(string destinationDirectory, IFileSystem fileSystem, ILogger<DiskFileHandler> logger)
         {
-            if (!Uri.IsWellFormedUriString(destinationDirectory, UriKind.RelativeOrAbsolute))
-            {
-                throw new ArgumentException("Destination directory is not in an appropriate format");
-            }
-
             _destinationDirectory = destinationDirectory;
             _fileSystem = fileSystem;
             _logger = logger;
@@ -28,34 +23,48 @@ namespace SiteSaver
         // Stores a file at the path relative to the provided destination directory
         public async Task Store(string relativePath, byte[] fileContent)
         {
+            var invalidPath = Path.GetInvalidPathChars();
+            var invalidFile = Path.GetInvalidFileNameChars();
+
+            if (Path.DirectorySeparatorChar != '/')
+            {
+                relativePath = relativePath.Replace('/', Path.DirectorySeparatorChar);
+            }
+
             if (relativePath.EndsWith(Path.DirectorySeparatorChar.ToString()))
             {
                 relativePath = Path.Combine(relativePath, "index.html").TrimStart(Path.DirectorySeparatorChar);
             }
 
-            var filePath = Path.Combine(_destinationDirectory, relativePath);
+            var relativePathDirectory = Path.GetDirectoryName(relativePath);
+            var relativePathFile = Path.GetFileName(relativePath);
 
-            if (!Path.HasExtension(filePath) && !string.IsNullOrEmpty(relativePath))
+            if (!Path.HasExtension(relativePathFile) && !string.IsNullOrEmpty(relativePathFile))
             {
-                filePath = Path.ChangeExtension(filePath, "html");
+                relativePathFile = Path.ChangeExtension(relativePathFile, "html");
             }
 
-            var directory = Path.GetDirectoryName(filePath);
+            relativePathDirectory = string.Join('_', relativePathDirectory.Split(Path.GetInvalidPathChars()));
+            relativePathFile = string.Join('_', relativePathFile.Split(Path.GetInvalidFileNameChars()));
+
+            var fullFilePath = Path.Combine(_destinationDirectory, relativePathDirectory, relativePathFile);
+
+            var directory = Path.GetDirectoryName(fullFilePath);
             _fileSystem.CreateDirectory(directory);
 
-            _logger.LogInformation("Writing {0} to disk", filePath);
+            _logger.LogInformation("Writing {0} to disk", fullFilePath);
 
             try
             {
-                await _fileSystem.WriteFileToDisk(filePath, fileContent);
+                await _fileSystem.WriteFileToDisk(fullFilePath, fileContent);
             }
             catch (IOException e)
             {
-                _logger.LogError("Failed to write {0} to disk, message: {1}", filePath, e.Message);
+                _logger.LogError("Failed to write {0} to disk, message: {1}", fullFilePath, e.Message);
                 return;
             }
 
-            _logger.LogInformation("Done writing {0} to disk", filePath);
+            _logger.LogInformation("Done writing {0} to disk", fullFilePath);
         }
     }
 }
